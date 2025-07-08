@@ -120,21 +120,6 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------
     # Fundamentals
     compustat_query = f"""
-        SELECT link.lpermno AS permno, co.gvkey, co.datadate, co.seq, co.oancf, co.sale, co.ib
-        FROM comp.funda as co
-        LEFT JOIN crsp.ccmxpf_linktable AS link ON co.gvkey = link.gvkey
-        WHERE link.linktype IN ('LU', 'LC')
-        AND linkprim IN ('P', 'C')
-        AND usedflag = 1
-        AND indfmt = 'INDL'
-        AND datafmt = 'STD'
-        AND consol = 'C'
-        AND curcd = 'USD'
-        AND datadate BETWEEN '2010-01-01' AND '2024-12-31'
-        AND link.lpermno IN ({permno_str})
-        """
-
-    compustat_query = f"""
         SELECT link.lpermno AS permno, co.gvkey, co.datadate, co.seqq, co.saleq, co.ibq, co.dpq
         FROM comp.fundq as co
         LEFT JOIN crsp.ccmxpf_linktable AS link ON co.gvkey = link.gvkey
@@ -156,12 +141,8 @@ if __name__ == "__main__":
     fund.rename(columns={"datadate": "date"}, inplace=True)
     fund.set_index(["date", "permno"], inplace=True)
     fund.drop("gvkey", axis=1, inplace=True)
-    fund.astype(float)
-
-"""
-SELECT link.lpermno AS permno, co.gvkey, co.datadate, co.seq, co.ceq, co.at, co.lt, co.txditc, co.txdb, co.itcb, co.pstkrv,
-co.pstkl, co.pstk, co.capx, co.oancf, co.sale, co.cogs, co.xint, co.xsga
-"""
+    fund = fund.astype(float)
+    fund.to_pickle(f"{DIR}/fundamentals.pkl")
 
 # Operating cash flow-to-price ratio (oancf - operating cash flow)
 # Sales-to-price (saleq - sales)
