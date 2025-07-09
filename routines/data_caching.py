@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------
     # CRSP (borrowed from https://www.tidy-finance.org/python/wrds-crsp-and-compustat.html)
     query = """
-        SELECT msf.permno, msf.date, date_trunc('month', msf.date)::date as month, msf.ret, msf.shrout, msf.vol, msf.prc, msf.altprc, msenames.exchcd, msenames.siccd, msedelist.dlret, msedelist.dlstcd
+        SELECT msf.permno, msf.date, date_trunc('month', msf.date)::date as month, msf.ret, msf.shrout, msf.vol, msf.prc, msf.altprc, msenames.exchcd, msenames.siccd, msenames.ticker, msenames.cusip, msedelist.dlret, msedelist.dlstcd
         FROM crsp.msf AS msf
         LEFT JOIN crsp.msenames as msenames ON msf.permno = msenames.permno AND msenames.namedt <= msf.date AND msf.date <= msenames.nameendt
         LEFT JOIN crsp.msedelist as msedelist
@@ -129,11 +129,9 @@ if __name__ == "__main__":
         AND indfmt = 'INDL'
         AND datafmt = 'STD'
         AND consol = 'C'
-        AND datadate BETWEEN '2023-01-01' AND '2024-12-31'
+        AND datadate BETWEEN '1984-12-31' AND '2024-12-31'
         AND link.lpermno IN ({permno_str})
         """
-
-    # TODO: cashflow = idbq + dpq
 
     fund = conn.raw_sql(compustat_query)
 
@@ -143,11 +141,3 @@ if __name__ == "__main__":
     fund.drop("gvkey", axis=1, inplace=True)
     fund = fund.astype(float)
     fund.to_pickle(f"{DIR}/fundamentals.pkl")
-
-# Operating cash flow-to-price ratio (oancf - operating cash flow)
-# Sales-to-price (saleq - sales)
-# Earnings-to-price (ib - Income Before Extraordinary Items)
-# Book-to-market ratio (seq - shareholders' equity)
-
-# Price momentum 11-1
-# Residual momentum
