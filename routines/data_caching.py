@@ -2,10 +2,10 @@ if __name__ == "__main__":
     import wrds
     import pandas as pd
     import numpy as np
-    import os
+    from signaltk import constants as cst
     from signaltk.core.utils import assign_industry, assign_exchange
 
-    DIR = os.path.join(os.getcwd(), "data")
+    DIR = cst.WDIR + "/data"
 
     # ---------------------------------------------------------------------
     # Preamble
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------
     # Fundamentals
     compustat_query = f"""
-        SELECT link.lpermno AS permno, co.gvkey, co.datadate, co.seqq, co.saleq, co.ibq, co.dpq
+        SELECT link.lpermno AS permno, co.gvkey, co.datadate, co.ceqq, co.seqq, co.saleq, co.ibq, co.dpq
         FROM comp.fundq as co
         LEFT JOIN crsp.ccmxpf_linktable AS link ON co.gvkey = link.gvkey
         WHERE link.linktype IN ('LU', 'LC')
