@@ -17,7 +17,7 @@ if __name__ == "__main__":
     ff = pd.read_pickle(f"{cst.WDIR}/data/ff.pkl")
     fund = pd.read_pickle(f"{cst.WDIR}/data/fundamentals.pkl")
 
-    signals = {}
+    collect_signals = {}
 
     # Book-to-market ratio
     me = (crsp["shrout"] * crsp["altprc"]).abs().replace(0, np.nan).astype(float)
@@ -28,16 +28,35 @@ if __name__ == "__main__":
     be = be.unstack()
     be = be.resample("ME").last().reindex(dt_idx)
     be = be.ffill(limit=2)
-    bm = (be * 1000 / me).stack()
+    b2m = (be * 1000 / me).stack()
 
-    signals["bm"] = bm
+    collect_signals["b2m"] = b2m
 
-    # TODO: cashflow = ibq + dpq
+    # Cash flow-to-price ratio (ibq + dpq) / market capitalization
+    cf = (fund["ibq"] + fund["dpq"])
+    cf = cf[~cf.index.duplicated(keep="last")]
+    cf = cf.unstack().resample("ME").last().reindex(dt_idx)
+    cf = cf.ffill(limit=2)
+    c2p = (cf * 1000 / me).stack()
+    collect_signals["c2p"] = c2p
 
-    # Operating cash flow-to-price ratio (oancf - operating cash flow)
     # Sales-to-price (saleq - sales)
-    # Earnings-to-price (ib - Income Before Extraordinary Items)
-    # Book-to-market ratio (seq - shareholders' equity)
+    sales = fund["saleq"]
+    sales = sales[~sales.index.duplicated(keep="last")]
+    sales = sales.unstack().resample("ME").last().reindex(dt_idx)
+    sales = sales.ffill(limit=2)
+    s2p = (sales * 1000 / me).stack()
+    collect_signals["s2p"] = s2p
+
+    # Earnings-to-price (ibq - Income Before Extraordinary Items)
+    earnings = fund["ibq"]
+    earnings = earnings[~earnings.index.duplicated(keep="last")]
+    earnings = earnings.unstack().resample("ME").last().reindex(dt_idx)
+    earnings = earnings.ffill(limit=2)
+    e2p = (earnings * 1000 / me).stack()
+    collect_signals["e2p"] = e2p
 
     # Price momentum 11-1
     # Residual momentum
+
+    signals = pd.DataFrame(collect_signals)
