@@ -17,6 +17,11 @@ if __name__ == "__main__":
     ff = pd.read_pickle(f"{cst.WDIR}/data/ff.pkl")
     fund = pd.read_pickle(f"{cst.WDIR}/data/fundamentals.pkl")
 
+    # Excess returns
+    xs_rt = crsp["excess_ret"].astype(float).add(1).apply(np.log)
+    xs_rt = xs_rt.unstack()
+    xs_rt = xs_rt.resample("ME").last()
+
     collect_signals = {}
 
     # Book-to-market ratio
@@ -57,6 +62,14 @@ if __name__ == "__main__":
     collect_signals["e2p"] = e2p
 
     # Price momentum 11-1
+    OBS_THRESH = 12
+    n_obs = xs_rt.rolling(12).count()
+    valid_obs = n_obs == OBS_THRESH
+    mom_12_1 = xs_rt.rolling(12).sum() - xs_rt
+
     # Residual momentum
 
+    # Beta
+
+    # Collect signals
     signals = pd.DataFrame(collect_signals)
