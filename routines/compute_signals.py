@@ -4,11 +4,6 @@ Taking only significant signals into account, beta is not included for that reas
 https://www.jstor.org/stable/pdf/48574457.pdf
 """
 
-from tracemalloc import start
-
-from routines.data_caching import DIR
-
-
 if __name__ == "__main__":
     import pandas as pd
     from signaltk import constants as cst
@@ -99,8 +94,8 @@ if __name__ == "__main__":
     collect_signals["resid_mom"] = resid_mom.stack()
 
     # Short-term reversal (Jegadeesh, 1990)
-    collect_signals["strev"] = -xs_rt
+    collect_signals["strev"] = -xs_rt.stack()
 
     # Collect signals
     signals = pd.DataFrame(collect_signals)
-    signals.to_pickle(f"{DIR}/raw_signals.pkl")
+    signals.to_pickle(f"{cst.WDIR}/data/raw_signals.pkl")
