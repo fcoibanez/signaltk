@@ -98,4 +98,5 @@ if __name__ == "__main__":
 
     # Collect signals
     signals = pd.DataFrame(collect_signals)
+    signals.index.names = ["date", "permno"]
     signals.to_pickle(f"{cst.WDIR}/data/raw_signals.pkl")

@@ -129,7 +129,7 @@ if __name__ == "__main__":
         AND indfmt = 'INDL'
         AND datafmt = 'STD'
         AND consol = 'C'
-        AND datadate BETWEEN '1984-12-31' AND '2024-12-31'
+        AND datadate BETWEEN '1960-01-01' AND '2024-12-31'
         AND link.lpermno IN ({permno_str})
         """
 
